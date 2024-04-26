@@ -29,7 +29,7 @@ class Pool(models.Model):
     pool_name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
-        return pool_name
+        return self.pool_name
 
 class Question(models.Model):
     pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
