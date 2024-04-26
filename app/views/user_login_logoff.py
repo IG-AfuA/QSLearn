@@ -5,9 +5,6 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 
-def index(request):
-    return render(request, 'app/index.html', {'authenticated':request.user.is_authenticated})
-
 def user_login(request):
     # We use this both for displaying the login page as well as
     # processing the POST request after filling out the form.
