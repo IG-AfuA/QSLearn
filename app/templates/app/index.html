@@ -1,4 +1,8 @@
-{% include "app/html_header.html" %}
+{% if authenticated %}
+{% include "app/html_header.html" with navbar_corner="Logout" %}
+{% else %}
+{% include "app/html_header.html" with navbar_corner="Login" %}
+{% endif %}
 
 {# FIXME: Display is conditional to user/login status #}
 <div class="container">
