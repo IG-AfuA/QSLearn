@@ -1,0 +1,52 @@
+{% include "app/html_header.html" %}
+
+{# FIXME: Display is conditional to user/login status #}
+<div class="container">
+  <div class="row">
+    <div class="column card w-25 m-3 p-0">
+      <div class="card-header">
+        <h5>Probeprüfung</h5>
+      </div>
+      <div class="card-body">
+        <p class="card-text">Bist du bereit für die Amateurfunkprüfung? Teste dein Wissen in dieser Probeprüfung.</p>
+      </div>
+      <div class="card-footer">
+        <a href="" class="btn btn-secondary m-1">Probeprüfung HB3</a>
+        <a href="" class="btn btn-secondary m-1">Probeprüfung HB9</a>
+      </div>
+    </div>
+
+    <div class="column card w-25 m-3 p-0">
+      <div class="card-header">
+        <h5 class="card-title">Selbststudium</h5>
+      </div>
+      <div class="card-body">
+        <p class="card-text">Hier kannst du den Stoff prüfen, den du dir kapitelweise im Selbststudium erarbeitest.</p>
+      </div>
+      <div class="card-footer">
+        <a href="" class="btn btn-secondary m-1">Selbststudium HB3</a>
+        <a href="" class="btn btn-secondary m-1">Selbststudium HB9</a>
+      </div>
+    </div>
+
+    <div class="column card w-25 m-3 p-0">
+      <div class="card-header">
+        <h5 class="card-title">Lernkontrolle im Kurs</h5>
+      </div>
+      <div class="card-body">
+        <p class="card-text">Klicke hier für Lernkontrollen und Probeprüfungen im Rahmen eines Amateurfunkkurses.</p>
+      </div>
+      <div class="card-footer">
+          <a href="" class="btn btn-secondary m-1">Kursbegleitung</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column w-100 m-3 p-0">
+      <p>Diese Webseite ist als Begleitwerkzeug für die Amateurfunkprüfung in der Schweiz gedacht. Wir empfehlen dir, die Prüfungsvorbereitung im Rahmen eines Amateurfunkkurses zu machen. So wirst du nicht nur auf die Prüfung vorbereitet, sondern lernst auch viele Dinge, die dann nach der Prüfung für deinen Einstieg in den Amateurfunk relevant sind. Ausserdem hast du auf diese Art von Beginn an Kontakt mit Funkamateurinnen und Funkamateuren, die dir beim Einstieg helfen werden. In der Regel beinhalten diese Kurse auch Praxistage, an welchen du selbst schon vor dem Bestehen der Prüfung selbst Funkverbindungen machen darfst und dabei etwas über die Gepflogenheiten im Amateurfunk und über die Betriebstechnik lernst.</p>
+      <p>Es ist aber auch möglich, sich mit den geeigneten Fachbücher im Selbststudium auf die Prüfung vorzubereiten. Auf alle Fälle lohnt es sich, sich mit dem Stoff auseinanderzusetzen und nicht einfach die richtigen Antworten auswendig zu lernen. Das Wissen, das du dir in der Prüfungsvorbereitung aneignest, hilft dir bei der späteren Umsetzung deiner Amateurfunkprojekte enorm. Trotzdem ist es hilfreich, sich an Beispielaufgaben messen zu können. Dafür ist diese Webseite gedacht. Da der Fragenkatalog für die Amateurfunkprüfung in der Schweiz nicht öffentlich ist, können wir hier diese Prüfungsfragen nicht abfragen. Die Fragen auf dieser Webseite stammen aus den Fragenkatalogen der deutschen Bundesnetzagentur (FIXME).</p>
+    </div>
+  </div>
+</div>
+{% include "app/html_footer.html" %}
