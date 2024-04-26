@@ -1,6 +1,9 @@
 {% include "app/html_header.html" %}
 
 <div class="container">
+  {% if error %}
+  <div id="notification" class="m-3 alert alert-warning" role="alert" class="d-block text-center">Benutzername oder Passwort ungültig.</div>
+  {% endif %}
   <div class="row justify-content-md-center">
     <div class="column card w-50 m-3 p-0">
       <form action="{% url 'app:user_login' %}" method="post">

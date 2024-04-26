@@ -20,6 +20,8 @@ def user_login(request):
                 return HttpResponseRedirect(request.POST['next'])
             else:
                 return HttpResponseRedirect(reverse('app:index'))
+        else:
+            return render(request, 'app/login.html', {'error':True})
 
         # else redisplay login page, but with error
     # ... and this is for displaying the form ...
