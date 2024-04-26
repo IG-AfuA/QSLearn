@@ -1,0 +1,33 @@
+{% include "app/html_header.html" %}
+
+<div class="container">
+  {% if error %}
+  <div id="notification" class="m-3 alert alert-warning" role="alert" class="d-block text-center">Benutzername oder Passwort ungültig.</div>
+  {% endif %}
+  <div class="row justify-content-md-center">
+    <div class="column card w-50 m-3 p-0">
+      <form action="{% url 'app:user_login' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" id="next" name="next" value="{{next}}">
+        <div class="card-header">
+          <h5>Login</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="username" name="username" placeholder="Benutzername">
+            <label for="username">Benutzername</label>
+          </div>
+          <div class="form-floating">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Passwort">
+            <label for="password">Passwort</label>
+          </div>
+        </div>
+        <div class="card-footer text-center">
+            <input type="submit" class="btn btn-primary" value="Login">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% include "app/html_footer.html" %}
