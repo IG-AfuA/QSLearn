@@ -7,5 +7,6 @@ def selfstudy_start(request, pool):
     categories = Category.objects.all()
     return render(request, 'app/selfstudy_start.html', {'pool':pool, 'categories': categories})
 
+@login_required
 def selfstudy_run(request, pool, category, subcategory=None):
-    pass
+    return render(request, 'app/selfstudy_static.html', {'pool':pool, 'selfpath':request.path})
