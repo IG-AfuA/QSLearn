@@ -1,0 +1,26 @@
+<div id="question" class="card m-3 p-0">
+  <div class="card-header">
+    <h5>Frage {{ question_id }}</h5>
+    <input type="hidden" id="question_id" name="question_id" value="{{question.id}}">
+    <input type="hidden" id="permutation" name="permutation" value="{{permutation}}">
+  </div>
+  {% autoescape off %}
+  <div class="card-body">
+    <p class="card-text">{{question.question_text}}</p>
+    <fieldset>
+      <div class="container">
+        {% for choice in answers %}
+        <div class="row">
+          <div class="col col-md-auto">
+            <input type="radio" id="q.{{forloop.counter0}}" name="q" value="{{forloop.counter0}}">
+          </div>
+          <div class="col">
+            <label for="q.{{forloop.counter0}}">{{choice}}</label>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </fieldset>
+  </div>
+  {% endautoescape %}
+</div>

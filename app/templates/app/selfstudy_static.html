@@ -1,0 +1,157 @@
+{% include "app/html_header.html" with title="Lernkontrolle "|add:pool navbar_corner="Logout" %}
+
+<form id="form" action="{{selfpath}}/card" method="post">
+{% csrf_token %}
+<div id="container" class="container-fluid">
+  <div class="row justify-content-md-center align-items-center">
+    <div class="col col-1">
+        <button type="button" class="btn btn-dark invisible" style="height:100px;">&#10094;</button>
+    </div>
+    <div class="col col-8">
+      <div id="progress">
+      {# Javascript will insert progress bar here #}
+      </div>
+      <div id="q">
+      {# JavaScript will insert question here #}
+      </div>
+    </div>
+    <div class="col col-1 text-end">
+      <input id="next_button" type="submit" class="btn btn-dark" style="height:100px;" value="&#10095;">
+    </div>
+  </div>
+</div>
+</form>
+
+
+<footer data-bs-theme="dark" class="fixed-bottom">
+  <div class="navbar navbar-dark bg-dark">          
+    <div class="container justify-content-md-center">
+      <span class="navbar-brand">
+        <a href="{% url 'app:selfstudy_start' pool %}" class="btn btn-danger">Zurück</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script>
+get_progress();
+get_card();
+function get_progress()
+{
+  fetch('{{selfpath}}/progress')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to retrieve HTML from URL: ' + url);
+        }
+        return response.text();
+    })
+    .then(html => {
+        document.getElementById("progress").innerHTML = html;
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+
+function get_card()
+{
+  // We pass this info to ensure the tool won't display the same question twice in a row
+  try {
+    var current_question = document.getElementById('question_id').getAttribute('value');
+  } catch(err)
+  {
+      var current_question = '';
+  }
+  // Disable while we fetch card
+  document.getElementById('next_button').classList.add('disabled');
+  fetch('{{selfpath}}/card?previous_question='+current_question)
+    .then(response => {
+        // Re-enable after success or failure
+        document.getElementById('next_button').classList.remove('disabled');
+        if (!response.ok) {
+            throw new Error('Failed to retrieve HTML from URL: ' + url);
+        }
+        return response.text();
+    })
+    .then(html => {
+        document.getElementById("q").innerHTML = html;
+        MathJax.typeset(); // Rescan for embedded MathJax
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+
+// See https://simonplend.com/how-to-use-fetch-to-post-form-data-as-json-to-your-api/
+/**
+ * Helper function for POSTing data as JSON with fetch.
+ *
+ * @param {Object} options
+ * @param {string} options.url - URL to POST data to
+ * @param {FormData} options.formData - `FormData` instance
+ * @return {Object} - Response body from URL that was POSTed to
+ */
+async function postFormDataAsJson({ url, formData }) {
+	const plainFormData = Object.fromEntries(formData.entries());
+	const formDataJsonString = JSON.stringify(plainFormData);
+
+	const fetchOptions = {
+		method: "POST",
+            redirect: 'follow',
+		headers: {
+			"Content-Type": "application/json",
+                        "X-CSRFToken": '{{csrf_token}}',
+			Accept: "application/json",
+		},
+		body: formDataJsonString,
+	};
+
+        document.getElementById('next_button').classList.add('disabled');
+	const response = await fetch(url, fetchOptions);
+
+        document.getElementById('next_button').classList.remove('disabled');
+	if (!response.ok) {
+		const errorMessage = await response.text();
+		throw new Error(errorMessage);
+	}
+
+	return response.text();
+}
+
+/**
+ * Event handler for a form submit event.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit_event
+ *
+ * @param {SubmitEvent} event
+ */
+async function handleFormSubmit(event) {
+	event.preventDefault();
+
+        if(document.getElementById("result"))
+        {
+            get_card();
+            return;
+        }
+
+	const form = event.currentTarget;
+	const url = form.action;
+
+	try {
+		const formData = new FormData(form);
+                const responseData = await postFormDataAsJson({url, formData });
+                document.getElementById("q").innerHTML = responseData;
+                MathJax.typeset();
+                get_progress();
+
+		console.log({ responseData });
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+const exampleForm = document.getElementById("form");
+exampleForm.addEventListener("submit", handleFormSubmit);
+</script>
+
+{% include "app/html_footer.html" %}

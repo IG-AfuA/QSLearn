@@ -1,0 +1,10 @@
+{# inline has fixed width and no text #}
+{% if inline %}
+<div class="progress mx-2 {% if invisible %}invisible{% endif %}" style="width:50px;">
+{% else %}
+<div class="progress p-0 m-3">
+{% endif %}
+  <div class="progress-bar bg-success" role="progressbar" style="width: {{progress}}%;" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">
+    {% if not inline %}{{progress}}%{% endif %}
+  </div>
+</div>

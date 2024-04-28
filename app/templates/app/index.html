@@ -28,8 +28,8 @@
         <p class="card-text">Hier kannst du den Stoff prüfen, den du dir kapitelweise im Selbststudium erarbeitest.</p>
       </div>
       <div class="card-footer">
-        <a href="" class="btn btn-secondary m-1">Selbststudium HB3</a>
-        <a href="" class="btn btn-secondary m-1">Selbststudium HB9</a>
+        <a href="{% url 'app:selfstudy_start' 'HB3' %}" class="btn btn-primary m-1">Selbststudium HB3</a>
+        <a href="{% url 'app:selfstudy_start' 'HB9' %}" class="btn btn-primary m-1">Selbststudium HB9</a>
       </div>
     </div>
 

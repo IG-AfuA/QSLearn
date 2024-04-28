@@ -1,0 +1,71 @@
+{% include "app/html_header.html" with title="Lernkontrolle "|add:pool %}
+{% load custom_filters %}
+
+<div class="container">
+  <div class="row m-2">
+    <p>Hier findest du eine Art Inhaltsverzeichnis des Stoffes, unterteilt in Kapitel und Unterkapitel. Mit einem Klick auf "Lernkontrolle" werden dir Fragen zu diesen Themen präsentiert, die du als Lernkontrolle nutzen kannst. "Alle bis hier" schliesst auch Fragen aus den bisherigen Kapiteln ein. Diese Funktion dient dazu, das bisher erarbeitete Wissen nicht wieder zu vergessen. Die Balken geben Aufschluss über den entsprechenden Lernerfolg.</p>
+  </div>
+  <div class="accordion accordion">
+    {% for category in categories %}
+    <div class="accordion-item">
+      <div id="categoryheader{{forloop.counter0}}" class="accordion-header d-flex bg-light align-items-center border-bottom">
+        {# FIXME: open if progress > 0 #}
+        <button class="accordion-button bg-transparent shadow-none {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#category{{forloop.counter0}}" aria-expanded="true" aria-controls="category{{forloop.counter0}}">
+          <div id="category{{forloop.counter0}}_progress">
+            {# will be replaced by AJAX call #}{% include 'app/selfstudy_progress.html' with inline=True %}
+          </div>
+          <strong>{{category.category_name}}</strong>
+          <div class="badge text-bg-secondary mx-2" title="Anzahl Fragen">{{ category|category_in_pool_count:pool }}</div>
+        </button>
+        <a href="{% url 'app:selfstudy_run' pool category.pk %}" class="btn btn-primary btn-sm mx-1 text-nowrap">Lernkontrolle</a>
+        <a href="{% url 'app:selfstudy_run_until' pool category.pk %}" class="btn btn-warning btn-sm mx-1 text-nowrap">Alle bis hier</a>
+      </div>
+      <div id="category{{forloop.counter0}}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="categoryheader{{forloop.counter0}}">
+        <div class="accordion-body">
+          {% for subcategory in category.subcategory_set.all|in_pool:pool %}
+          <div class="d-flex flex-row align-items-center">
+            <div id="category{{forloop.parentloop.counter0}}_subcategory{{forloop.counter0}}_progress">
+              {# will be replaced by AJAX call #}{% include 'app/selfstudy_progress.html' with inline=True %}
+            </div>
+            <div>{{subcategory.subcategory_name}}</div>
+            <div class="badge text-bg-secondary mx-2" title="Anzahl Fragen">{{ subcategory|subcategory_in_pool_count:pool }}</div>
+            <a href="{% url 'app:selfstudy_run' pool category.pk subcategory.pk %}" class="btn btn-primary btn-sm m-1 text-nowrap">Lernkontrolle</a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+{# FIXME: Do this in a JavaScript loop instead of in the template? #}
+{% for category in categories %}
+  fetch_and_populate('{% url 'app:selfstudy_progress_inline' pool category.id %}', 'category{{forloop.counter0}}_progress');
+  // FIXME: calculate these from subcategory count in javascript?
+  {% for subcategory in category.subcategory_set.all|in_pool:pool %}
+    fetch_and_populate('{% url 'app:selfstudy_progress_inline' pool category.id subcategory.id %}', 'category{{forloop.parentloop.counter0}}_subcategory{{forloop.counter0}}_progress');
+  {% endfor %}
+{% endfor %}
+
+function fetch_and_populate(url, id)
+{
+  fetch(url)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to retrieve HTML from URL: ' + url);
+        }
+        return response.text();
+    })
+    .then(html => {
+        document.getElementById(id).innerHTML = html;
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+</script>
+
+
+{% include "app/html_footer.html" %}
