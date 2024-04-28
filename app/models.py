@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 import itertools, random
 
@@ -93,3 +94,30 @@ class Question(models.Model):
 
     def __str__(self):
         return self.pool.pool_name+'/'+self.question_id
+
+# Use this to track user progress. A user masters a particular question if that
+# question was answered MASTER_THRESHOLD times correctly. Wrong answers are
+# penalized by reducing the score accordingly.
+MASTER_THRESHOLD = 3 # FIXME: Put this in a config file or something
+class Question_Score(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    correct_answers = models.IntegerField(default=0)
+
+    # score is 1 iff user masters question.
+    @property
+    def score(self):
+        return self.correct_answers / MASTER_THRESHOLD
+
+    def increase_score(self):
+        if self.correct_answers < MASTER_THRESHOLD:
+            self.correct_answers += 1
+            self.save()
+
+    def decrease_score(self):
+        if self.correct_answers > 0:
+            self.correct_answers -= 1
+            self.save()
+
+    def __str__(self):
+        return(f'{self.question}: {self.score*100}%')

@@ -28,6 +28,13 @@ def selfstudy_card(request, pool, category, subcategory=None, until=False):
 
         correct_answer = question.solution_permutation(permutation)
 
+        # Here we update the score
+        score, created = Question_Score.objects.get_or_create(user=request.user, question=question)
+        if submitted_answer == correct_answer:
+            score.increase_score()
+        else:
+            score.decrease_score()
+
         return render(request, 'app/selfstudy_card_result.html', {'question':question, 'question_id':question.question_id, 'answers':answers, 'submitted_answer':submitted_answer, 'correct_answer':correct_answer,'answers':answers})
 
     else:
