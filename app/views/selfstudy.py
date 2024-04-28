@@ -53,8 +53,10 @@ def selfstudy_card(request, pool, category, subcategory=None, until=False):
         return render(request, 'app/selfstudy_card.html', {'question':question, 'question_id':question.question_id, 'answers':answers, 'permutation':permutation})
 
 @login_required
-def selfstudy_progress(request, pool, category, subcategory=None, until=False):
+def selfstudy_progress(request, pool, category, subcategory=None, until=False, inline=False):
     questions = Question.objects.filter_questions(pool, category, subcategory, until)
     scores = Question_Score.objects.filter(user__username=request.user.username, question__in=questions)
     score = scores.aggregate(Sum('correct_answers'))['correct_answers__sum']
-    return render(request, 'app/selfstudy_progress.html', {'progress':int(100*score/MASTER_THRESHOLD/questions.count())})
+    if score is None:
+        score = 0.
+    return render(request, 'app/selfstudy_progress.html', {'progress':int(100*score/MASTER_THRESHOLD/questions.count()),'inline':inline})
