@@ -38,7 +38,28 @@ class Pool(models.Model):
     def __str__(self):
         return self.pool_name
 
+# This is a custom manager to retrieve questions from a given pool, category and
+# optional subcategory. All subcategories within the category are considered if
+# none is given. If until==True we also include questions from categories that
+# precede the given one. If until==True, subcategory must be None.
+# See https://stackoverflow.com/questions/4541780/where-to-put-common-queries-in-django
+class QuestionManager(models.Manager):
+    # Usage: Question.objects.filter_questions(pool, category, subcategory, until)
+    def filter_questions(self, pool, category, subcategory=None, until=False):
+        ret = super(QuestionManager, self).get_queryset().filter(pool__pool_name=pool)
+        if subcategory is not None:
+            ret = ret.filter(subcategory=subcategory)
+
+        if until:
+            # FIXME: Use order_number here to ensure independence on PK order
+            ret = ret.filter(subcategory__parent__pk__lte=category)
+        else:
+            ret = ret.filter(subcategory__parent__pk = category)
+
+        return ret
+
 class Question(models.Model):
+    objects = QuestionManager()
     pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
     subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
     question_id = models.CharField(max_length=20)

@@ -32,18 +32,12 @@ def selfstudy_card(request, pool, category, subcategory=None, until=False):
 
     else:
         # ... otherwise we display a regular card
-        questions = Question.objects.filter(pool__pool_name=pool).select_related('subcategory', 'subcategory__parent')
+        questions = Question.objects.filter_questions(pool, category, subcategory, until)
         if 'previous_question' in request.GET and request.GET['previous_question'] != '':
+            # FIXME: Ensure no category contains one single question...
             questions = questions.exclude(id=request.GET['previous_question'])
 
-        if subcategory is not None:
-            questions = questions.filter(subcategory=subcategory)
-
-        if until:
-            # FIXME: Use order_number here to ensure independence on PK order
-            question = questions.filter(subcategory__parent__pk__lte=category).order_by("?").first()
-        else:
-            question = questions.filter(subcategory__parent__pk = category).order_by("?").first()
+        question = questions.order_by("?").first()
 
         permutation, answers = question.answers_permutation()
         return render(request, 'app/selfstudy_card.html', {'question':question, 'question_id':question.question_id, 'answers':answers, 'permutation':permutation})
