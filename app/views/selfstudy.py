@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from ..models import *
+from django.db.models import Sum
 from django.shortcuts import render
 
 import json
@@ -44,9 +45,16 @@ def selfstudy_card(request, pool, category, subcategory=None, until=False):
             # FIXME: Ensure no category contains one single question...
             questions = questions.exclude(id=request.GET['previous_question'])
 
+        # FIXME: For now we randomly pick a question, but it would make more sense to
+        # have a clever strategy here.
         question = questions.order_by("?").first()
 
         permutation, answers = question.answers_permutation()
         return render(request, 'app/selfstudy_card.html', {'question':question, 'question_id':question.question_id, 'answers':answers, 'permutation':permutation})
 
-
+@login_required
+def selfstudy_progress(request, pool, category, subcategory=None, until=False):
+    questions = Question.objects.filter_questions(pool, category, subcategory, until)
+    scores = Question_Score.objects.filter(user__username=request.user.username, question__in=questions)
+    score = scores.aggregate(Sum('correct_answers'))['correct_answers__sum']
+    return render(request, 'app/selfstudy_progress.html', {'progress':int(100*score/MASTER_THRESHOLD/questions.count())})

@@ -9,7 +9,7 @@
     </div>
     <div class="col col-8">
       <div id="progress">
-          {# FIXME: TODO #}
+      {# Javascript will insert progress bar here #}
       </div>
       <div id="q">
       {# JavaScript will insert question here #}
@@ -34,7 +34,25 @@
 </footer>
 
 <script>
+get_progress();
 get_card();
+function get_progress()
+{
+  fetch('{{selfpath}}/progress')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to retrieve HTML from URL: ' + url);
+        }
+        return response.text();
+    })
+    .then(html => {
+        document.getElementById("progress").innerHTML = html;
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+
 function get_card()
 {
   // We pass this info to ensure the tool won't display the same question twice in a row
