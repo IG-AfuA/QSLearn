@@ -53,12 +53,22 @@ class Question(models.Model):
     def answers(self):
         return (self.answer_0, self.answer_1, self.answer_2, self.answer_3)
 
-    # Return a random permutation of the answer set along with an integer identifying
-    # the permutation (as enumerted in PERMUTATIONS).
-    def answers_permutation(self):
-        permutation = random.randrange(len(PERMUTATIONS))
+    # Return a permutation of the answer set along with an integer identifying
+    # the permutation (as enumerted in PERMUTATIONS). If this identifyer is
+    # zero, we randomly generate one.
+
+    # The function can be used to generate a random permutation of ansers
+    # (using permutation=None) or to reproduce the answer set for a given
+    # permutation.
+    def answers_permutation(self, permutation=None):
+        if permutation is None:
+            permutation = random.randrange(len(PERMUTATIONS))
         answers = self.answers()
         return permutation, tuple(answers[p] for p in PERMUTATIONS[permutation])
+
+    # Return the solution numer of this question for a given permutation
+    def solution_permutation(self, permutation):
+        return PERMUTATIONS[permutation].index(self.solution)
 
     def __str__(self):
         return self.pool.pool_name+'/'+self.question_id

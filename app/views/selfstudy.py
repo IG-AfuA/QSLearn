@@ -2,6 +2,8 @@ from django.contrib.auth.decorators import login_required
 from ..models import *
 from django.shortcuts import render
 
+import json
+
 @login_required
 def selfstudy_start(request, pool):
     categories = Category.objects.all()
@@ -15,7 +17,19 @@ def selfstudy_run(request, pool, category, subcategory=None):
 def selfstudy_card(request, pool, category, subcategory=None, until=False):
     if request.method =='POST':
         # Answer was submitted --> display solution ...
-        pass # FIXME: TODO
+        data = json.loads(request.body)
+        question = Question.objects.get(pk=data['question_id'])
+        permutation = int(data['permutation'])
+        _, answers = question.answers_permutation(permutation)
+        if 'q' in data:
+            submitted_answer = int(data['q'])
+        else:
+            submitted_answer = None
+
+        correct_answer = question.solution_permutation(permutation)
+
+        return render(request, 'app/selfstudy_card_result.html', {'question':question, 'question_id':question.question_id, 'answers':answers, 'submitted_answer':submitted_answer, 'correct_answer':correct_answer,'answers':answers})
+
     else:
         # ... otherwise we display a regular card
         questions = Question.objects.filter(pool__pool_name=pool).select_related('subcategory', 'subcategory__parent')
