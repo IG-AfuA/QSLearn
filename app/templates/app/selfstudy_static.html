@@ -56,7 +56,7 @@ function get_card()
         return response.text();
     })
     .then(html => {
-        document.getElementById("q0").innerHTML = html;
+        document.getElementById("q").innerHTML = html;
         MathJax.typeset(); // Rescan for embedded MathJax
     })
     .catch(error => {

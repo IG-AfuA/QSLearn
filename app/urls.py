@@ -12,6 +12,7 @@ urlpatterns = [
     path('selfstudy/<str:pool>/questions/<int:category>', views.selfstudy_run, name='selfstudy_run'),
     path('selfstudy/<str:pool>/questions/<int:category>/<int:subcategory>', views.selfstudy_run, name='selfstudy_run'),
     path('selfstudy/<str:pool>/questions_until/<int:category>', views.selfstudy_run, name='selfstudy_run_until'),
-
-
+    path('selfstudy/<str:pool>/questions/<int:category>/card', views.selfstudy_card, name='selfstudy_card'),
+    path('selfstudy/<str:pool>/questions/<int:category>/<int:subcategory>/card', views.selfstudy_card, name='selfstudy_card'),
+    path('selfstudy/<str:pool>/questions_until/<int:category>/card', views.selfstudy_card, {'until':True}, name='selfstudy_card_until'),
     ]
