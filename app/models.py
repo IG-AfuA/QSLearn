@@ -91,7 +91,7 @@ class Question(models.Model):
         answers = self.answers()
         return permutation, tuple(answers[p] for p in PERMUTATIONS[permutation])
 
-    # Return the solution numer of this question for a given permutation
+    # Return the solution number of this question for a given permutation
     def solution_permutation(self, permutation):
         return PERMUTATIONS[permutation].index(self.solution)
 
