@@ -1,0 +1,35 @@
+<div id="result" class="card m-3 p-0">
+  {% if submitted_answer == correct_answer %}
+  <div class="card-header text-bg-success">
+  {% else %}
+  <div class="card-header text-bg-danger">
+  {% endif %}
+    <h5>Frage {{ question_id }}</h5>
+    <input type="hidden" id="question_id" name="question_id" value="{{question.id}}">
+  </div>
+  {% autoescape off %}
+  <div class="card-body">
+    <p class="card-text">{{question.question_text}}</p>
+    <fieldset>
+      <div class="container">
+        {% for choice in answers %}
+        {% if forloop.counter0 == correct_answer %}
+        <div class="row bg-success-subtle">
+        {% elif forloop.counter0 == submitted_answer %}
+        <div class="row bg-danger-subtle">
+        {% else %}
+        <div class="row">
+        {% endif %}
+          <div class="col col-md-auto">
+            <input type="radio" id="q{{question_number}}.{{forloop.counter0}}" name="q{{question_number}}" value="{{forloop.counter0}}" disabled {% if forloop.counter0 == submitted_answer %}checked{% endif %}>
+          </div>
+          <div class="col">
+            <label for="q{{question_number}}.{{forloop.counter0}}">{{choice}}</label>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </fieldset>
+  </div>
+  {% endautoescape %}
+</div>

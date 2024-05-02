@@ -29,4 +29,5 @@ urlpatterns = [
     path('mockquiz/<str:pool>/questions', views.mockquiz_run, name='mockquiz_run'),
     path('mockquiz/<str:pool>/submit', views.mockquiz_submit, name='mockquiz_submit'),
     path('mockquiz/<str:pool>/results', views.mockquiz_results, name='mockquiz_results'),
+    path('mockquiz/<str:pool>/new', views.mockquiz_new, name='mockquiz_new'),
     ]

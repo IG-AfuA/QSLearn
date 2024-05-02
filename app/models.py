@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.utils import timezone
@@ -152,6 +153,27 @@ class MockQuiz(models.Model):
     def seconds_left(self):
         ret = self.due_time - timezone.now()
         return max(0, ret.total_seconds())
+
+    @property
+    def duration(self):
+        return self.end_time - self.start_time
+
+    @property
+    def duration_string(self):
+        delta = self.duration
+        return f'{int(delta.total_seconds()//60):02d}:{int(round(delta.total_seconds()%60)):02d}'
+
+    @property
+    def total_items(self):
+        return self.mockquiz_item_set.count()
+
+    @property
+    def correct_items(self):
+        return self.mockquiz_item_set.filter(submitted_answer=F('correct_answer')).count()
+
+    @property
+    def incorrect_items(self):
+        return self.total_items-self.mockquiz_item_set.filter(submitted_answer=F('correct_answer')).count()
 
     def start_quiz(self, duration_minutes):
         # Prevent resetting due time by re-opening quiz

@@ -8,6 +8,7 @@ import random
 # FIXME: Put these in a configuration file
 QUESTIONS_PER_QUIZ = 20
 QUIZ_DURATION_MINUTES = 90
+PASS_THRESHOLD = 0.7
 
 # Here, we compile quiz questions and prepare everything for the quiz.
 # However, we do not open the quiz just yet.
@@ -62,7 +63,27 @@ def mockquiz_submit(request, pool):
 
 
 def mockquiz_results(request, pool):
-    pass
+    session_key = request.session.session_key
+    quiz = _mockquiz_get_current_quiz(pool, session_key)
+
+    if not quiz.started:
+        return # Catch this properly
+    # Quiz should be closed already, but if a user never submitted (deadline expired)
+    # or if he enters the /results URL manually, we force a close here.
+    quiz.end_quiz()
+
+    score = quiz.correct_items / quiz.total_items
+    passed = score > PASS_THRESHOLD
+    return render(request, 'app/mockquiz_results.html', {'pool':pool, 'quiz':quiz, 'score':int(100*score), 'passed':passed})
+
+def mockquiz_new(request, pool):
+    session_key = request.session.session_key
+    try:
+        quiz = _mockquiz_get_current_quiz(pool, session_key)
+        quiz.delete()
+    except MockQuiz.DoesNotExist:
+        pass
+    return HttpResponseRedirect(reverse('app:mockquiz_start', args=(pool,)))
 
 def _mockquiz_compile(pool, session_key):
     pool_instance = Pool.objects.get(pool_name=pool)
