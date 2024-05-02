@@ -25,10 +25,9 @@
 <form>
 <div id="container" class="container-fluid">
   <div class="row justify-content-md-center align-items-center">
-    {# FIXME: Merge with selfstudy_card_result.html #}
     {% for quiz_item in quiz.mockquiz_item_set.all %}
       <div id="q{{forloop.counter0}}" class="question col col-8">
-        {% include "app/mockquiz_card_result.html" with question_id=forloop.counter question_number=quiz_item.question_number question=quiz_item.question answers=quiz_item.answers_permutation correct_answer=quiz_item.correct_answer submitted_answer=quiz_item.submitted_answer %}
+        {% include "app/card_result.html" with question_id=forloop.counter question_number=quiz_item.question_number question=quiz_item.question answers=quiz_item.answers_permutation correct_answer=quiz_item.correct_answer submitted_answer=quiz_item.submitted_answer %}
       </div>
     {% endfor %}
   </div>
