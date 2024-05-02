@@ -1,5 +1,7 @@
 from ..models import *
 from django.shortcuts import render
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 import random
 
@@ -11,12 +13,16 @@ QUIZ_DURATION_MINUTES = 90
 # However, we do not open the quiz just yet.
 def mockquiz_start(request, pool):
     session_key = request.session.session_key
-    if session_key is None or not MockQuiz.objects.filter(session=session_key, pool__pool_name=pool).exists():
+    if session_key is None:
         # FIXME: Catch case where session cookie could not be stored
         request.session.create()
         session_key = request.session.session_key
 
-    # FIXME: Check if we already have set up a quiz
+    if MockQuiz.objects.filter(session=session_key, pool__pool_name=pool).exists():
+        # We already have a quiz for this pool, so we redirect there
+        # instead of setting up a new quiz.
+        return HttpResponseRedirect(reverse('app:mockquiz_run', args=(pool,)))
+
     _mockquiz_compile(pool, session_key)
     return render(request, 'app/mockquiz_start.html', {'pool':pool, 'questions_count':QUESTIONS_PER_QUIZ, 'quiz_duration':QUIZ_DURATION_MINUTES})
 
