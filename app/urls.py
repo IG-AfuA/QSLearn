@@ -23,4 +23,10 @@ urlpatterns = [
     path('selfstudy/<str:pool>/questions_until/<int:category>/progress', views.selfstudy_progress, {'until':True}, name='selfstudy_progress_until'),
     path('selfstudy/<str:pool>/questions/<int:category>/progress_inline', views.selfstudy_progress, {'inline':True}, name='selfstudy_progress_inline'),
     path('selfstudy/<str:pool>/questions/<int:category>/<int:subcategory>/progress_inline', views.selfstudy_progress, {'inline':True}, name='selfstudy_progress_inline'),
+
+
+    path('mockquiz/<str:pool>', views.mockquiz_start, name='mockquiz_start'),
+    path('mockquiz/<str:pool>/questions', views.mockquiz_run, name='mockquiz_run'),
+    path('mockquiz/<str:pool>/submit', views.mockquiz_submit, name='mockquiz_submit'),
+    path('mockquiz/<str:pool>/results', views.mockquiz_results, name='mockquiz_results'),
     ]
