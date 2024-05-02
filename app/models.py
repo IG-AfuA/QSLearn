@@ -154,7 +154,7 @@ class MockQuiz(models.Model):
         return max(0, ret.total_seconds())
 
     def start_quiz(self, duration_minutes):
-        # Prevent resetting due time by re-opening exam
+        # Prevent resetting due time by re-opening quiz
         if not self.started:
             self.start_time = timezone.now()
             self.due_time = self.start_time + datetime.timedelta(minutes=duration_minutes)
@@ -169,7 +169,7 @@ class MockQuiz(models.Model):
 # A question in a mock quiz
 # FIXME: Check if we can use order_with_respect_to for this
 class MockQuiz_Item(models.Model):
-    exam = models.ForeignKey(MockQuiz, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(MockQuiz, on_delete=models.CASCADE)
     question_number = models.IntegerField() # Used for sorting
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     submitted_answer = models.IntegerField(default=None, null=True)
