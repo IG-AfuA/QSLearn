@@ -133,3 +133,13 @@ class MockQuiz(models.Model):
     start_time = models.DateTimeField('When did user start the quiz?', blank=True, null=True)
     due_time = models.DateTimeField('When is the quiz due?', blank=True, null=True)
     end_time = models.DateTimeField('When did the user hand in quiz?', blank=True, null=True)
+
+# A question in a mock quiz
+# FIXME: Check if we can use order_with_respect_to for this
+class MockQuiz_Item(models.Model):
+    exam = models.ForeignKey(MockQuiz, on_delete=models.CASCADE)
+    question_number = models.IntegerField() # Used for sorting
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    submitted_answer = models.IntegerField(default=None, null=True)
+    correct_answer = models.IntegerField()
+    permutation = models.IntegerField()
