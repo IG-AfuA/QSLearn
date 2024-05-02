@@ -1,0 +1,26 @@
+{% include "app/html_header.html" with title="Probeprüfung "|add:pool %}
+
+<div class="container">
+  <div class="row justify-content-md-center">
+    <div class="column card w-50 m-3 p-0">
+      <div class="card-header">
+        <h5>Prüfungsstart</h5>
+      </div>
+      <div class="card-body">
+      <p class="card-text">Die Prüfung ist zeitlich begrenzt. Viel Erfolg!</p>
+        <table class="table table-borderless">
+          <tr><td>Ihre Prüfung:</td><td>{{pool}}</td></tr>
+          <tr><td>Anzahl Fragen:</td><td>{{questions_count}}</td></tr>
+          <tr><td>Maximale Punktzahl:</td><td>{{questions_count}}</td></tr>
+          <tr><td>Maximale Fehlerpunkte:</td><td>{{questions_count}}</td></tr>
+          <tr><td>Zeit:</td><td>{{quiz_duration}} Minuten</td></tr>
+        </table>
+      </div>
+      <div class="card-footer text-center">
+        <a href="{% url 'app:mockquiz_run' pool %}" class="btn btn-primary m-1">Prüfung starten</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include "app/html_footer.html" %}
