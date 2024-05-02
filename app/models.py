@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
+from django.utils import timezone
+
 
 import itertools, random
 
@@ -121,3 +124,12 @@ class Question_Score(models.Model):
 
     def __str__(self):
         return(f'{self.question}: {self.score*100}%')
+
+
+class MockQuiz(models.Model):
+    # FIXME: (session, pool) is unique
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
+    start_time = models.DateTimeField('When did user start the quiz?', blank=True, null=True)
+    due_time = models.DateTimeField('When is the quiz due?', blank=True, null=True)
+    end_time = models.DateTimeField('When did the user hand in quiz?', blank=True, null=True)
