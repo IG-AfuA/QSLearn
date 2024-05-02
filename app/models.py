@@ -144,6 +144,11 @@ class MockQuiz(models.Model):
         return self.end_time is not None
 
     @property
+    def ended_before_due(self):
+        # False if not yet closed
+        return self.end_time < self.due_time
+
+    @property
     def seconds_left(self):
         ret = self.due_time - timezone.now()
         return max(0, ret.total_seconds())
@@ -154,6 +159,12 @@ class MockQuiz(models.Model):
             self.start_time = timezone.now()
             self.due_time = self.start_time + datetime.timedelta(minutes=duration_minutes)
             self.save()
+
+    def end_quiz(self):
+        if not self.closed:
+            self.end_time = timezone.now()
+            self.save()
+
 
 # A question in a mock quiz
 # FIXME: Check if we can use order_with_respect_to for this

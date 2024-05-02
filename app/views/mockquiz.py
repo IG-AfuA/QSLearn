@@ -39,9 +39,27 @@ def mockquiz_run(request, pool):
 
     return render(request, 'app/mockquiz.html', {'pool':pool, 'quiz':quiz, 'countdown':quiz.seconds_left})
 
-
 def mockquiz_submit(request, pool):
-    pass
+    session_key = request.session.session_key
+    quiz = _mockquiz_get_current_quiz(pool, session_key)
+
+    # Quiz should be running while we submit
+    if not quiz.started or quiz.closed:
+        return # Catch this properly
+
+    quiz.end_quiz()
+
+    if quiz.ended_before_due:
+        for item in quiz.mockquiz_item_set.order_by('question_number'):
+            if 'q'+str(item.question_number) in request.POST:
+                item.submitted_answer = int(request.POST['q'+str(item.question_number)])
+                item.save()
+
+    # Always return an HttpResponseRedirect after successfully dealing
+    # with POST data. This prevents data from being posted twice if a
+    # user hits the Back button.
+    return HttpResponseRedirect(reverse('app:mockquiz_results', args=(pool,)))
+
 
 def mockquiz_results(request, pool):
     pass

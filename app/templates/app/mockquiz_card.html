@@ -12,10 +12,10 @@
         {% for choice in answers %}
         <div class="row">
           <div class="col col-md-auto">
-            <input type="radio" id="q.{{forloop.counter0}}" name="q" value="{{forloop.counter0}}">
+            <input type="radio" id="q{{question_number}}.{{forloop.counter0}}" name="q{{question_number}}" value="{{forloop.counter0}}">
           </div>
           <div class="col">
-            <label for="q.{{forloop.counter0}}">{{choice}}</label>
+            <label for="q{{question_number}}.{{forloop.counter0}}">{{choice}}</label>
           </div>
         </div>
         {% endfor %}
