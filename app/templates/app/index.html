@@ -15,8 +15,8 @@
         <p class="card-text">Bist du bereit für die Amateurfunkprüfung? Teste dein Wissen in dieser Probeprüfung.</p>
       </div>
       <div class="card-footer">
-        <a href="" class="btn btn-secondary m-1">Probeprüfung HB3</a>
-        <a href="" class="btn btn-secondary m-1">Probeprüfung HB9</a>
+        <a href="{% url 'app:mockquiz_start' 'HB3' %}" class="btn btn-primary m-1">Probeprüfung HB3</a>
+        <a href="{% url 'app:mockquiz_start' 'HB9' %}" class="btn btn-primary m-1">Probeprüfung HB9</a>
       </div>
     </div>
 

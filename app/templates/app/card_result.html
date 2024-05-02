@@ -21,10 +21,10 @@
         <div class="row">
         {% endif %}
           <div class="col col-md-auto">
-            <input type="radio" id="q.{{forloop.counter0}}" name="q" value="{{forloop.counter0}}" disabled {% if forloop.counter0 == submitted_answer %}checked{% endif %}>
+            <input type="radio" id="q{{question_number}}.{{forloop.counter0}}" name="q{{question_number}}" value="{{forloop.counter0}}" disabled {% if forloop.counter0 == submitted_answer %}checked{% endif %}>
           </div>
           <div class="col">
-            <label for="q.{{forloop.counter0}}">{{choice}}</label>
+            <label for="q{{question_number}}.{{forloop.counter0}}">{{choice}}</label>
           </div>
         </div>
         {% endfor %}

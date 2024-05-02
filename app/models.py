@@ -1,7 +1,12 @@
 from django.db import models
+from django.db.models import F
 from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
+from django.utils import timezone
+
 
 import itertools, random
+import datetime
 
 ANSWERS_PER_QUESTION = 4 # If you change this, you also have to change the Quesiton class below
 # Enumerate all permutations
@@ -88,7 +93,7 @@ class Question(models.Model):
         answers = self.answers()
         return permutation, tuple(answers[p] for p in PERMUTATIONS[permutation])
 
-    # Return the solution numer of this question for a given permutation
+    # Return the solution number of this question for a given permutation
     def solution_permutation(self, permutation):
         return PERMUTATIONS[permutation].index(self.solution)
 
@@ -121,3 +126,82 @@ class Question_Score(models.Model):
 
     def __str__(self):
         return(f'{self.question}: {self.score*100}%')
+
+
+class MockQuiz(models.Model):
+    # FIXME: (session, pool) is unique
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
+    start_time = models.DateTimeField('When did user start the quiz?', blank=True, null=True)
+    due_time = models.DateTimeField('When is the quiz due?', blank=True, null=True)
+    end_time = models.DateTimeField('When did the user hand in quiz?', blank=True, null=True)
+
+    @property
+    def started(self):
+        return self.start_time is not None
+
+    @property
+    def closed(self):
+        return self.end_time is not None
+
+    @property
+    def ended_before_due(self):
+        # False if not yet closed
+        return self.end_time < self.due_time
+
+    @property
+    def seconds_left(self):
+        ret = self.due_time - timezone.now()
+        return max(0, ret.total_seconds())
+
+    @property
+    def duration(self):
+        return self.end_time - self.start_time
+
+    @property
+    def duration_string(self):
+        delta = self.duration
+        return f'{int(delta.total_seconds()//60):02d}:{int(round(delta.total_seconds()%60)):02d}'
+
+    @property
+    def total_items(self):
+        return self.mockquiz_item_set.count()
+
+    @property
+    def correct_items(self):
+        return self.mockquiz_item_set.filter(submitted_answer=F('correct_answer')).count()
+
+    @property
+    def incorrect_items(self):
+        return self.total_items-self.mockquiz_item_set.filter(submitted_answer=F('correct_answer')).count()
+
+    def start_quiz(self, duration_minutes):
+        # Prevent resetting due time by re-opening quiz
+        if not self.started:
+            self.start_time = timezone.now()
+            self.due_time = self.start_time + datetime.timedelta(minutes=duration_minutes)
+            self.save()
+
+    def end_quiz(self):
+        if not self.closed:
+            self.end_time = timezone.now()
+            self.save()
+
+
+# A question in a mock quiz
+# FIXME: Check if we can use order_with_respect_to for this
+class MockQuiz_Item(models.Model):
+    quiz = models.ForeignKey(MockQuiz, on_delete=models.CASCADE)
+    question_number = models.IntegerField() # Used for sorting
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    submitted_answer = models.IntegerField(default=None, null=True)
+    correct_answer = models.IntegerField()
+    permutation = models.IntegerField()
+
+    # Here, we return the possible answers according to the permutation stored
+    # in the "permutation" field. We do not return the permutation index
+    # (unlike Question.answers_permutation())
+    @property
+    def answers_permutation(self):
+        _, answers = self.question.answers_permutation(self.permutation)
+        return answers

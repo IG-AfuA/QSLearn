@@ -36,7 +36,7 @@ def selfstudy_card(request, pool, category, subcategory=None, until=False):
         else:
             score.decrease_score()
 
-        return render(request, 'app/selfstudy_card_result.html', {'question':question, 'question_id':question.question_id, 'answers':answers, 'submitted_answer':submitted_answer, 'correct_answer':correct_answer,'answers':answers})
+        return render(request, 'app/card_result.html', {'question':question, 'question_id':question.question_id, 'answers':answers, 'submitted_answer':submitted_answer, 'correct_answer':correct_answer,'answers':answers})
 
     else:
         # ... otherwise we display a regular card
@@ -50,7 +50,7 @@ def selfstudy_card(request, pool, category, subcategory=None, until=False):
         question = questions.order_by("?").first()
 
         permutation, answers = question.answers_permutation()
-        return render(request, 'app/selfstudy_card.html', {'question':question, 'question_id':question.question_id, 'answers':answers, 'permutation':permutation})
+        return render(request, 'app/card.html', {'question':question, 'question_id':question.question_id, 'answers':answers, 'permutation':permutation})
 
 @login_required
 def selfstudy_progress(request, pool, category, subcategory=None, until=False, inline=False):
