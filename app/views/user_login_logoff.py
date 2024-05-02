@@ -8,6 +8,12 @@ from django.urls import reverse
 def user_login(request):
     # We use this both for displaying the login page as well as
     # processing the POST request after filling out the form.
+    if 'next' in request.GET:
+        redirect = request.GET['next']
+    elif 'next' in request.POST:
+        redirect = request.POST['next']
+    else:
+        redirect = None
 
     # This is for processing the post request ...
     if 'username' in request.POST and 'password' in request.POST:
@@ -21,12 +27,12 @@ def user_login(request):
             else:
                 return HttpResponseRedirect(reverse('app:index'))
         else:
-            return render(request, 'app/login.html', {'error':True})
+            # else redisplay login page, but with error
+            return render(request, 'app/login.html', {'next':redirect, 'error':True})
 
-        # else redisplay login page, but with error
     # ... and this is for displaying the form ...
     else:
-        return render(request, 'app/login.html')
+        return render(request, 'app/login.html', {'next':redirect} )
 
 @login_required
 def user_logout(request):
