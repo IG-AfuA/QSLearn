@@ -1,0 +1,97 @@
+{% include "app/html_header.html" with title="Probeprüfung "|add:pool %}
+
+<div id="notification" role="alert" class="d-block text-center"></div>
+
+<form action="{% url 'app:mockquiz_submit' pool %}" method="post">
+{% csrf_token %}
+<div id="container" class="container-fluid">
+  <div class="row justify-content-md-center align-items-center">
+    <div class="col col-1">
+      {# FIXME 100px hardcoded #}
+      <button type="button" class="btn btn-dark" style="height:100px;" onclick="prev_question()">&#10094;</button>
+    </div>
+    {# FIXME: Return this in defined order #}
+    {% for quiz_item in quiz.mockquiz_item_set.all %}
+      {# We display one card at a time #}
+      <div id="q{{forloop.counter0}}" class="question col col-8 {% if not forloop.first %}d-none{% endif %}">
+        {# FIXME: Merge with selfstudy_card.html #}
+        {# FIXME: use https://getbootstrap.com/docs/5.3/components/list-group/ #}
+        {# FIXME: Also use pagination or offcanvas and flags #}
+        {% include "app/mockquiz_card.html" with question_id=forloop.counter question=quiz_item.question answers=quiz_item.answers_permutation %}
+      </div>
+    {% endfor %}
+    <div class="col col-1 text-end">
+        <button type="button" class="btn btn-dark" style="height:100px;" onclick="next_question()">&#10095;</button>
+    </div>
+  </div>
+</div>
+
+<footer data-bs-theme="dark" class="fixed-bottom">
+  <div class="navbar navbar-dark bg-dark">          
+    <div class="container justify-content-md-center">
+      <span class="navbar-brand">
+        <input type="submit" class="btn btn-danger" value="Prüfung beenden">
+      </span>
+  </div>
+</footer>
+</form>
+
+<script>
+  function next_question()
+  {
+    var questions = document.getElementsByClassName("question");
+    for([i, question] of Object.entries(questions))
+    {
+      if(!question.classList.contains("d-none"))
+      {
+        var question_number = parseInt(question.id.substr(1));
+        var next_question_number = (question_number+1) % questions.length;
+        var next_question = document.getElementById("q"+next_question_number);
+        question.classList.add("d-none");
+        next_question.classList.remove("d-none");
+        break;
+      }
+    }
+  }
+  function prev_question()
+  {
+    var questions = document.getElementsByClassName("question");
+    for([i, question] of Object.entries(questions))
+    {
+      if(!question.classList.contains("d-none"))
+      {
+        var question_number = parseInt(question.id.substr(1));
+        var next_question_number = question_number-1;
+        if(next_question_number < 0) next_question_number = questions.length-1;
+        var next_question = document.getElementById("q"+next_question_number);
+        question.classList.add("d-none");
+        next_question.classList.remove("d-none");
+        break;
+      }
+    }
+  }
+</script>
+
+<script>
+  var due = new Date();
+  due.setSeconds(due.getSeconds()+{{countdown}});
+  setInterval(function()
+  {
+    var now = new Date();
+    var time_left = Math.round((due - now)/1000);
+    if(time_left < 0)
+    {
+      time_left = 0;
+      const notification = document.getElementById('notification');
+      notification.classList.add("alert");
+      notification.classList.add("alert-warning");
+      notification.innerHTML = "Zeit abgelaufen. Bitte Prüfung beenden.";
+    }
+    var minutes_left = Math.floor(time_left / 60);
+    var seconds_left = time_left % 60;
+    document.getElementById("navbar_corner").innerHTML = minutes_left + ":" + String(seconds_left).padStart(2, '0');;
+  },
+      1000);
+</script>
+
+{% include "app/html_footer.html" %}

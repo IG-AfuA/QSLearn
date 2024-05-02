@@ -5,6 +5,7 @@ from django.utils import timezone
 
 
 import itertools, random
+import datetime
 
 ANSWERS_PER_QUESTION = 4 # If you change this, you also have to change the Quesiton class below
 # Enumerate all permutations
@@ -134,6 +135,26 @@ class MockQuiz(models.Model):
     due_time = models.DateTimeField('When is the quiz due?', blank=True, null=True)
     end_time = models.DateTimeField('When did the user hand in quiz?', blank=True, null=True)
 
+    @property
+    def started(self):
+        return self.start_time is not None
+
+    @property
+    def closed(self):
+        return self.end_time is not None
+
+    @property
+    def seconds_left(self):
+        ret = self.due_time - timezone.now()
+        return max(0, ret.total_seconds())
+
+    def start_quiz(self, duration_minutes):
+        # Prevent resetting due time by re-opening exam
+        if not self.started:
+            self.start_time = timezone.now()
+            self.due_time = self.start_time + datetime.timedelta(minutes=duration_minutes)
+            self.save()
+
 # A question in a mock quiz
 # FIXME: Check if we can use order_with_respect_to for this
 class MockQuiz_Item(models.Model):
@@ -143,3 +164,11 @@ class MockQuiz_Item(models.Model):
     submitted_answer = models.IntegerField(default=None, null=True)
     correct_answer = models.IntegerField()
     permutation = models.IntegerField()
+
+    # Here, we return the possible answers according to the permutation stored
+    # in the "permutation" field. We do not return the permutation index
+    # (unlike Question.answers_permutation())
+    @property
+    def answers_permutation(self):
+        _, answers = self.question.answers_permutation(self.permutation)
+        return answers

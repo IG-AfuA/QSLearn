@@ -21,7 +21,18 @@ def mockquiz_start(request, pool):
     return render(request, 'app/mockquiz_start.html', {'pool':pool, 'questions_count':QUESTIONS_PER_QUIZ, 'quiz_duration':QUIZ_DURATION_MINUTES})
 
 def mockquiz_run(request, pool):
-    pass
+    session_key = request.session.session_key
+    quiz = _mockquiz_get_current_quiz(pool, session_key)
+
+    if quiz.closed:
+        # Go to results
+        return HttpResponseRedirect(reverse('app:mockquiz_results', args=(pool,)))
+
+    if not quiz.started:
+        quiz.start_quiz(QUIZ_DURATION_MINUTES)
+
+    return render(request, 'app/mockquiz.html', {'pool':pool, 'quiz':quiz, 'countdown':quiz.seconds_left})
+
 
 def mockquiz_submit(request, pool):
     pass
@@ -51,3 +62,7 @@ def _mockquiz_compile(pool, session_key):
             correct_answer = question.solution_permutation(permutation),
             permutation = permutation
         )
+
+# A user can have one open quiz per pool
+def _mockquiz_get_current_quiz(pool, session_key):
+    return MockQuiz.objects.get(session=session_key, pool__pool_name=pool)
